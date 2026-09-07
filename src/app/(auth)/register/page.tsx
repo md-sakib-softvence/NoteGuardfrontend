@@ -11,11 +11,10 @@ import Logo from "@/components/common/Logo";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [fullName, setFullName] = useState("john Dheere");
-  const [businessName, setBusinessName] = useState("john Dheere");
-  const [email, setEmail] = useState("johndheere@gmail.com");
-  const [password, setPassword] = useState("password123");
-  const [confirmPassword, setConfirmPassword] = useState("password123");
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -74,19 +73,6 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Business Name */}
-          <div className="flex flex-col gap-2 px-4 w-full">
-            <label className="text-sm font-medium text-[#2b353d] dark:text-slate-300">
-              Business Name
-            </label>
-            <input
-              type="text"
-              required
-              value={businessName}
-              onChange={(e) => setBusinessName(e.target.value)}
-              className="w-full bg-transparent! focus:bg-transparent! border-b border-border/80 px-3 py-2.5 text-sm text-primary-text focus:border-[#337bff] focus:outline-none transition-colors cursor-pointer"
-            />
-          </div>
 
           {/* Email */}
           <div className="flex flex-col gap-2 px-4 w-full">
