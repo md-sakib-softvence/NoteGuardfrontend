@@ -4,6 +4,7 @@ import type {
   UpdateProfilePayload,
   UserInterestGroup,
   AllUsersResponse,
+  UserPostsResponse,
 } from "./user.type";
 
 const userApi = baseApi.injectEndpoints({
@@ -56,6 +57,10 @@ const userApi = baseApi.injectEndpoints({
       query: () => "/users/interests",
       providesTags: ["User"],
     }),
+    getUserPosts: builder.query<UserPostsResponse, string>({
+      query: (id) => `/users/${id}/posts`,
+      providesTags: ["User"],
+    }),
   }),
 });
 
@@ -66,5 +71,6 @@ export const {
   useGetAllUsersQuery,
   useDeleteUserMutation,
   useGetUsersByInterestsQuery,
+  useGetUserPostsQuery,
 } = userApi;
 export default userApi;

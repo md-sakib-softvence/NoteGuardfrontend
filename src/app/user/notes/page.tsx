@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import AnimatedContainer from "@/components/common/AnimatedContainer";
-import { FileText, Plus, Search, Trash2, Loader2, Sparkles } from "lucide-react";
+import { FileText, Plus, Search, Trash2, Loader2, Sparkles, Edit3 } from "lucide-react";
 import Link from "next/link";
 import { useGetMyNotesQuery, useDeleteNoteMutation } from "@/store/Api/Note/note.api";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -21,15 +21,24 @@ export default function MyNotesPage() {
 
   const notes = data?.data || [];
 
-  const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`Are you sure you want to delete "${title}"?`)) return;
-
-    try {
-      await deleteNote(id).unwrap();
-      toast.success(`Note "${title}" deleted successfully.`);
-    } catch (err: any) {
-      toast.error(err?.data?.message || "Failed to delete note");
-    }
+  const handleDelete = (id: string, title: string) => {
+    toast(`Are you sure you want to delete "${title}"?`, {
+      action: {
+        label: "Delete",
+        onClick: async () => {
+          try {
+            await deleteNote(id).unwrap();
+            toast.success(`Note "${title}" deleted successfully.`);
+          } catch (err: any) {
+            toast.error(err?.data?.message || "Failed to delete note");
+          }
+        },
+      },
+      cancel: {
+        label: "Cancel",
+        onClick: () => {},
+      },
+    });
   };
 
   const formatDate = (isoString?: string) => {
@@ -112,14 +121,27 @@ export default function MyNotesPage() {
                 <div className="p-2.5 bg-blue-50 dark:bg-slate-800 rounded-xl text-blue-500 dark:text-blue-400">
                   <FileText className="w-5 h-5" />
                 </div>
-                <button
-                  onClick={() => handleDelete(note._id, note.title)}
-                  disabled={isDeleting}
-                  className="p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30"
-                  title="Delete note"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-1">
+                  <Link
+                    href={`/user/notes/edit/${note._id}`}
+                    className="p-1.5 text-gray-400 hover:text-blue-500 transition-colors rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950/30"
+                    title="Edit note"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </Link>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleDelete(note._id, note.title);
+                    }}
+                    disabled={isDeleting}
+                    className="p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30"
+                    title="Delete note"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
               <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2 line-clamp-1">

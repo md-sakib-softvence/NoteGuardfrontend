@@ -22,12 +22,15 @@ import {
   Tag,
   AlertTriangle,
   Users,
+  MessageSquare,
+  FileText,
 } from "lucide-react";
 import {
   useGetAllUsersQuery,
   useCreateUserMutation,
   useUpdateUserProfileMutation,
   useDeleteUserMutation,
+  useGetUserPostsQuery,
 } from "@/store/Api/User/user.api";
 import { toast } from "sonner";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -58,9 +61,17 @@ export default function UserManagementPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isPostsModalOpen, setIsPostsModalOpen] = useState(false);
 
   // Active selected user for Edit, Detail, Delete
   const [selectedUser, setSelectedUser] = useState<any>(null);
+
+  const { data: postsData, isLoading: isPostsLoading } = useGetUserPostsQuery(
+    selectedUser?._id || "",
+    {
+      skip: !isPostsModalOpen || !selectedUser?._id,
+    }
+  );
 
   // Form states for Add User
   const [newUserData, setNewUserData] = useState({
@@ -173,6 +184,11 @@ export default function UserManagementPage() {
   const handleOpenDetailModal = (user: any) => {
     setSelectedUser(user);
     setIsDetailModalOpen(true);
+  };
+
+  const handleOpenPostsModal = (user: any) => {
+    setSelectedUser(user);
+    setIsPostsModalOpen(true);
   };
 
   const handleOpenDeleteModal = (user: any) => {
@@ -397,6 +413,15 @@ export default function UserManagementPage() {
                           title="View Details"
                         >
                           <Eye className="w-4 h-4" />
+                        </button>
+
+                        {/* View Posts button */}
+                        <button
+                          onClick={() => handleOpenPostsModal(user)}
+                          className="p-1.5 text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/30 cursor-pointer"
+                          title="View User Posts"
+                        >
+                          <MessageSquare className="w-4 h-4" />
                         </button>
 
                         {/* Edit button */}
@@ -900,6 +925,79 @@ export default function UserManagementPage() {
                     Delete User
                   </>
                 )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ------------------------------------------------------------- */}
+      {/* 5. USER POSTS MODAL                                           */}
+      {/* ------------------------------------------------------------- */}
+      {isPostsModalOpen && selectedUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-xl max-w-2xl w-full max-h-[85vh] flex flex-col animate-in fade-in zoom-in duration-200">
+            <div className="p-6 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600">
+                  <MessageSquare className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-slate-800 dark:text-white">
+                    {selectedUser.name}&apos;s Posts
+                  </h2>
+                  <p className="text-xs text-gray-400">View all content authored by this user</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsPostsModalOpen(false)}
+                className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto space-y-4">
+              {isPostsLoading ? (
+                <div className="py-12 text-center text-slate-400 flex flex-col items-center">
+                  <Loader2 className="w-8 h-8 animate-spin mb-3 text-emerald-500" />
+                  Loading posts...
+                </div>
+              ) : !postsData?.data || postsData.data.length === 0 ? (
+                <div className="py-12 text-center text-slate-400 flex flex-col items-center">
+                  <FileText className="w-10 h-10 mb-3 opacity-30 text-slate-400" />
+                  <p>No posts found for this user.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {postsData.data.map((post: any) => (
+                    <div
+                      key={post._id}
+                      className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-700"
+                    >
+                      <div className="flex justify-between items-start gap-4">
+                        <h4 className="font-semibold text-slate-800 dark:text-white text-sm">
+                          {post.title}
+                        </h4>
+                        <span className="text-[10px] text-gray-400 shrink-0">
+                          {new Date(post.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-600 dark:text-slate-300 mt-2 line-clamp-3 leading-relaxed">
+                        {post.content}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            <div className="p-4 border-t border-gray-100 dark:border-slate-800 text-right shrink-0">
+              <button
+                onClick={() => setIsPostsModalOpen(false)}
+                className="px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+              >
+                Close
               </button>
             </div>
           </div>

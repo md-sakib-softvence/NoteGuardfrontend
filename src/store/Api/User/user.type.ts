@@ -52,3 +52,19 @@ export interface AllUsersResponse {
     };
   };
 }
+
+export interface PostItem {
+  _id: string;
+  title: string;
+  content: string;
+  authorId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UserPostsResponse {
+  statusCode: number;
+  success: boolean;
+  message: string;
+  data: PostItem[];
+}
