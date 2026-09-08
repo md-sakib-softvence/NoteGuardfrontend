@@ -17,10 +17,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BaseKit",
-  description: "Premium, production-ready Next.js starter kit",
+  title: {
+    default: "NoteGuard | Secure Workspace",
+    template: "%s | NoteGuard",
+  },
+  description: "NoteGuard - Secure, fast, and encrypted workspace for notes, posts, and teams.",
   icons: {
-    icon: "/basekitfavicon.png",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
   },
 };
 

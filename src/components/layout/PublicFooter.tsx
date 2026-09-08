@@ -101,7 +101,7 @@ export default function PublicFooter() {
         {/* Divider + Copyright */}
         <div className="border-t border-white/10 mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-center">
           <p className="text-xs text-white/50">
-            &copy; {new Date().getFullYear()} BaseKit. All rights reserved.
+            &copy; {new Date().getFullYear()} NoteGuard. All rights reserved.
           </p>
           <p className="text-xs text-white/30">
             Built with Next.js &amp; TypeScript

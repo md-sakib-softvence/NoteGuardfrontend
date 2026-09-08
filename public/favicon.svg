@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="ng-grad-bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="50%" stop-color="#4F46E5"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="ng-grad-shield" x1="16" y1="12" x2="48" y2="52" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#E0E7FF"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Outer Rounded Square -->
+  <rect width="64" height="64" rx="16" fill="url(#ng-grad-bg)"/>
+  
+  <!-- Shield Shape -->
+  <path d="M32 13L47 18.5V29.5C47 39 40.5 47.8 32 50.5C23.5 47.8 17 39 17 29.5V18.5L32 13Z" fill="url(#ng-grad-shield)" fill-opacity="0.25" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Security Note Lines -->
+  <path d="M26 25H38M26 31H38M26 37H33" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+</svg>

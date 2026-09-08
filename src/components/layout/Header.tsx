@@ -38,7 +38,7 @@ const initialNotifications: NotificationItem[] = [
   {
     id: "3",
     title: "Billing Invoice Paid",
-    description: "Invoice #1092-B has been paid by Client BaseKit.",
+    description: "Invoice #1092-B has been paid by Client NoteGuard.",
     time: "1 hour ago",
     read: true,
   },

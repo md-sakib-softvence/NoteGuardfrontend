@@ -208,7 +208,7 @@ export default function Sidebar({ navGroups, isMobileOpen, setIsMobileOpen }: Si
         </button>
       )}
 
-      {/* Sidebar Header with Site-styled BaseKit Logo - h-20 to align with Top Header */}
+      {/* Sidebar Header with Site-styled NoteGuard Logo - h-20 to align with Top Header */}
       <div className={cn("h-20 flex items-center justify-center border-b border-border shrink-0", showCollapsed ? "px-1" : "px-4")}>
         <Link href={navGroups[0]?.items?.[0]?.path || "/"} className="w-full no-underline outline-none">
           <Logo collapsed={showCollapsed} className="w-full justify-center sm:justify-start" />
