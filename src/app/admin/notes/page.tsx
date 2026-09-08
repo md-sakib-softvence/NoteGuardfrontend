@@ -1,13 +1,27 @@
+"use client";
+
 import React from "react";
 import AnimatedContainer from "@/components/common/AnimatedContainer";
-import { Search, Trash2, Eye } from "lucide-react";
+import { Search, Trash2, Eye, Loader2 } from "lucide-react";
+import { useGetMyNotesQuery, useDeleteNoteMutation } from "@/store/Api/Note/note.api";
+import { toast } from "sonner";
+import { INote } from "@/store/Api/Note/note.type";
 
 export default function AllNotesPage() {
-  const allNotes = [
-    { id: 101, title: "Database Architecture", author: "Alice Smith", date: "2026-10-24", size: "12 KB" },
-    { id: 102, title: "Marketing Plan", author: "Bob Jones", date: "2026-10-23", size: "8 KB" },
-    { id: 103, title: "Server Credentials", author: "Charlie Brown", date: "2026-10-20", size: "2 KB" },
-  ];
+  const { data: notesData, isLoading, refetch } = useGetMyNotesQuery({});
+  const [deleteNote, { isLoading: isDeleting }] = useDeleteNoteMutation();
+
+  const allNotes = notesData?.data || [];
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteNote(id).unwrap();
+      toast.success("Note deleted successfully");
+      refetch();
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to delete note");
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -26,41 +40,56 @@ export default function AllNotesPage() {
 
       <AnimatedContainer delay={0.1} className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-600 dark:text-gray-300">
-            <thead className="text-xs uppercase bg-gray-50 dark:bg-slate-800/50 text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-slate-800">
-              <tr>
-                <th className="px-6 py-4 font-medium">Title</th>
-                <th className="px-6 py-4 font-medium">Author</th>
-                <th className="px-6 py-4 font-medium">Date Created</th>
-                <th className="px-6 py-4 font-medium">Size</th>
-                <th className="px-6 py-4 font-medium text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
-              {allNotes.map((note) => (
-                <tr key={note.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/20 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap font-medium text-slate-800 dark:text-white">
-                    {note.title}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-blue-500 hover:underline cursor-pointer">
-                    {note.author}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-500">{note.date}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-500">{note.size}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <button className="p-1.5 text-gray-400 hover:text-blue-500 transition-colors" title="View Note">
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button className="p-1.5 text-gray-400 hover:text-red-500 transition-colors" title="Delete Note">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
+          {isLoading ? (
+            <div className="flex items-center justify-center p-12">
+              <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+            </div>
+          ) : (
+            <table className="w-full text-left text-sm text-gray-600 dark:text-gray-300">
+              <thead className="text-xs uppercase bg-gray-50 dark:bg-slate-800/50 text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-slate-800">
+                <tr>
+                  <th className="px-6 py-4 font-medium">Title</th>
+                  <th className="px-6 py-4 font-medium">Author</th>
+                  <th className="px-6 py-4 font-medium">Date Created</th>
+                  <th className="px-6 py-4 font-medium text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
+                {allNotes.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                      No notes found.
+                    </td>
+                  </tr>
+                )}
+                {allNotes.map((note: INote) => (
+                  <tr key={note._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/20 transition-colors">
+                    <td className="px-6 py-4 font-medium text-slate-800 dark:text-white max-w-[300px] truncate">
+                      {note.title}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-blue-500">
+                      {note.userId && typeof note.userId === 'object' && 'name' in note.userId ? note.userId.name : 'Unknown User'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-500">
+                      {new Date(note.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button 
+                          onClick={() => handleDelete(note._id)}
+                          disabled={isDeleting}
+                          className="p-1.5 text-gray-400 hover:text-red-500 transition-colors cursor-pointer" 
+                          title="Delete Note"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </AnimatedContainer>
     </div>

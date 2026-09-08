@@ -4,6 +4,7 @@ import {
   PenSquare,
   MessageSquare,
   PenTool,
+  Shield,
 } from "lucide-react";
 import { NavGroup } from "./types";
 
@@ -17,6 +18,12 @@ export const userNavItems: NavGroup[] = [
       { name: "My Posts", path: "/user/posts", icon: MessageSquare },
       { name: "Create Post", path: "/user/posts/new", icon: PenTool },
       { name: "Profile", path: "/user/profile", icon: User },
+    ],
+  },
+  {
+    group: "Workspace",
+    items: [
+      { name: "Switch to Admin View", path: "/admin/notes", icon: Shield, adminOnly: true },
     ],
   },
 ];

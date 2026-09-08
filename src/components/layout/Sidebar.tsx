@@ -8,6 +8,9 @@ import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 import { NavGroup, NavItem } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 import Logo from "@/components/common/Logo";
+import { useAppSelector } from "@/hooks/useRedux";
+import { useDispatch } from "react-redux";
+import { logOut } from "@/store/features/AuthSlice/authSlice";
 
 interface SidebarProps {
   navGroups: NavGroup[];
@@ -123,6 +126,9 @@ const SidebarItem = ({ item, pathname, depth = 0 }: { item: NavItem; pathname: s
 
 export default function Sidebar({ navGroups, isMobileOpen, setIsMobileOpen }: SidebarProps) {
   const pathname = usePathname();
+  const dispatch = useDispatch();
+  const { user } = useAppSelector((state: any) => state.auth);
+
   const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     const w = window.innerWidth;
@@ -215,18 +221,29 @@ export default function Sidebar({ navGroups, isMobileOpen, setIsMobileOpen }: Si
         </Link>
       </div>
 
-      {/* Navigation Groups */}
       <div className="flex-1 overflow-y-auto px-4 py-6 space-y-7 scrollbar-thin scrollbar-thumb-slate-200">
-        {navGroups.map((group, idx) => (
-          <div key={idx} className="space-y-2">
-            {!showCollapsed && (
-              <span className="text-xs uppercase tracking-wider font-semibold text-muted-blue px-4 block">
-                {group.group}
-              </span>
-            )}
-            <div className="space-y-2">
-              {group.items.map((item) =>
-                showCollapsed ? (
+        {navGroups.map((group, idx) => {
+          // Filter items based on adminOnly flag
+          const filteredItems = group.items.filter(item => {
+            if (item.adminOnly) {
+              return user?.role === 'admin' || user?.role === 'superAdmin';
+            }
+            return true;
+          });
+
+          // Don't render the group if it has no items left after filtering
+          if (filteredItems.length === 0) return null;
+
+          return (
+            <div key={idx} className="space-y-2">
+              {!showCollapsed && (
+                <span className="text-xs uppercase tracking-wider font-semibold text-muted-blue px-4 block">
+                  {group.group}
+                </span>
+              )}
+              <div className="space-y-2">
+                {filteredItems.map((item) =>
+                  showCollapsed ? (
                   <Link
                     key={item.path}
                     href={item.path}
@@ -254,7 +271,8 @@ export default function Sidebar({ navGroups, isMobileOpen, setIsMobileOpen }: Si
               )}
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* User Profile Card at Bottom */}
@@ -268,28 +286,27 @@ export default function Sidebar({ navGroups, isMobileOpen, setIsMobileOpen }: Si
                 height={40}
                 className="w-10 h-10 rounded-xl border border-border object-cover"
               />
-            <button className="text-muted-blue hover:text-red-500 transition-colors cursor-pointer">
+            <button 
+              onClick={() => dispatch(logOut())}
+              className="text-muted-blue hover:text-red-500 transition-colors cursor-pointer"
+            >
               <LogOut className="w-5 h-5" />
             </button>
           </div>
         ) : (
           <div className="flex items-center justify-between p-3 border border-border rounded-xl bg-primary-background">
             <div className="flex items-center gap-3">
-              <Image
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80"
-                alt="User Avatar"
-                width={48}
-                height={48}
-                className="w-12 h-12 rounded-xl border border-border object-cover"
-              />
-              <div className="flex flex-col">
-                <span className="text-sm font-semibold text-primary-text leading-tight">Alex</span>
-                <span className="text-xs text-muted-blue leading-tight mt-0.5">Manager Admin</span>
+              <div className="w-12 h-12 rounded-xl border border-border bg-blue-100 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center text-xl font-bold shrink-0">
+                {user?.name ? user.name.substring(0, 2).toUpperCase() : "U"}
+              </div>
+              <div className="flex flex-col truncate">
+                <span className="text-sm font-semibold text-primary-text leading-tight truncate">{user?.name || "User"}</span>
+                <span className="text-xs text-muted-blue leading-tight mt-0.5 capitalize truncate">{user?.role || "User"}</span>
               </div>
             </div>
             <button 
-              onClick={() => window.location.href = "/"}
-              className="text-muted-blue hover:text-red-500 transition-colors cursor-pointer"
+              onClick={() => dispatch(logOut())}
+              className="text-muted-blue hover:text-red-500 transition-colors cursor-pointer shrink-0 ml-2"
             >
               <LogOut className="w-4 h-4" />
             </button>

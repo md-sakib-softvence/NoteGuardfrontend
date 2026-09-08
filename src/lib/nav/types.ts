@@ -6,6 +6,7 @@ export type NavItem = {
   path: string;
   icon?: React.ComponentType<any>;
   children?: NavItem[];
+  adminOnly?: boolean;
 };
 
 export type NavGroup = {

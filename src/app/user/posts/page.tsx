@@ -11,11 +11,14 @@ import Link from "next/link";
 export default function MyPostsPage() {
   const { user } = useAppSelector((state: any) => state.auth);
   
-  const { data: postsData, isLoading } = useGetUserPostsQuery(user?._id || "", {
-    skip: !user?._id,
+  const { data: postsData, isLoading } = useGetUserPostsQuery(user?.userId || "", {
+    skip: !user?.userId,
   });
 
-  const posts = postsData?.data || [];
+  // The backend $lookup aggregation returns the user object with a .posts array
+  const posts = Array.isArray(postsData?.data) 
+    ? postsData.data 
+    : postsData?.data?.posts || [];
 
   return (
     <div className="space-y-6">

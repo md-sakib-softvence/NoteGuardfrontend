@@ -35,6 +35,17 @@ const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
+    updateMyProfile: builder.mutation<
+      UserProfile,
+      UpdateProfilePayload
+    >({
+      query: (payload) => ({
+        url: `/users/update-user`,
+        method: "PUT",
+        body: payload,
+      }),
+      invalidatesTags: ["User"],
+    }),
     getAllUsers: builder.query<AllUsersResponse, Record<string, unknown> | void>({
       query: (params) => ({
         url: "/users/alluser",
@@ -68,6 +79,7 @@ export const {
   useGetUserProfileQuery,
   useCreateUserMutation,
   useUpdateUserProfileMutation,
+  useUpdateMyProfileMutation,
   useGetAllUsersQuery,
   useDeleteUserMutation,
   useGetUsersByInterestsQuery,

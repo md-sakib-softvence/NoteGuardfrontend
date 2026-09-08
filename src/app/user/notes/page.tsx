@@ -15,6 +15,7 @@ export default function MyNotesPage() {
 
   const { data, isLoading } = useGetMyNotesQuery({
     searchTerm: debouncedSearch || undefined,
+    myNotes: 'true',
   });
 
   const [deleteNote, { isLoading: isDeleting }] = useDeleteNoteMutation();
