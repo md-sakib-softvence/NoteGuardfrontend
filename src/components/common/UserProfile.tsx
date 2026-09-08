@@ -30,7 +30,7 @@ export default function UserProfile({ className }: UserProfileProps) {
     profileImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80"
   };
 
-  const displayName = user?.email ? user.email.split('@')[0] : demoUser.name;
+  const displayName = user?.name || (user?.email ? user.email.split('@')[0] : demoUser.name);
   const displayEmail = user?.email || demoUser.email;
   const displayRole = user?.role || demoUser.role;
   const displayImage = demoUser.profileImage;

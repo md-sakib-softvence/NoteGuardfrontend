@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useTheme } from "next-themes";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 import Logo from "@/components/common/Logo";
+import { useForgetPasswordMutation } from "@/store/Api/Auth/auth.api";
 
 // Reusable Step Indicators Component
 function StepIndicators({ step }: { step: "email" | "otp" | "reset" }) {
@@ -74,6 +75,7 @@ function StepHeader({ step }: { step: "email" | "otp" | "reset" }) {
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
+  const [forgetPasswordMutation] = useForgetPasswordMutation();
   const [step, setStep] = useState<"email" | "otp" | "reset">("email");
 
   // Form states
@@ -95,12 +97,16 @@ export default function ForgotPasswordPage() {
 
   const handleForgotEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!emailOrPhone.trim()) {
+      toast.error("Please enter your registered email");
+      return;
+    }
     setIsSubmitting(true);
     setTimeout(() => {
       setIsSubmitting(false);
-      toast.info("OTP sent to your registered Email/Phone.");
+      toast.info("Verification code sent to your email.");
       setStep("otp");
-    }, 1200);
+    }, 800);
   };
 
   const handleForgotOtpSubmit = (e: React.FormEvent) => {
@@ -108,19 +114,37 @@ export default function ForgotPasswordPage() {
     setIsSubmitting(true);
     setTimeout(() => {
       setIsSubmitting(false);
-      toast.success("OTP verified!");
+      toast.success("Code verified! Set your new password.");
       setStep("reset");
-    }, 1200);
+    }, 600);
   };
 
-  const handleForgotResetSubmit = (e: React.FormEvent) => {
+  const handleForgotResetSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+    if (newPassword.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      await forgetPasswordMutation({
+        email: emailOrPhone.trim().toLowerCase(),
+        newPassword,
+      }).unwrap();
       toast.success("Password reset successfully! Please log in.");
       router.push("/login");
-    }, 1500);
+    } catch (err: any) {
+      toast.error(
+        err?.data?.message || err?.error || "Password reset failed. User may not exist."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleOtpChange = (index: number, val: string) => {

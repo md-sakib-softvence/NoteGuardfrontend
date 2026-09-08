@@ -24,8 +24,22 @@ const authApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
+    forgetPassword: builder.mutation<
+      BackendResponse<any>,
+      { email: string; name?: string; newPassword?: string }
+    >({
+      query: (data) => ({
+        url: "/auth/forget-password",
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation, useSignupMutation } = authApi;
+export const {
+  useLoginMutation,
+  useSignupMutation,
+  useForgetPasswordMutation,
+} = authApi;
 export default authApi;
