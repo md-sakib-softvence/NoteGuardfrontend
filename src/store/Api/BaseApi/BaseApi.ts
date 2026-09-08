@@ -9,10 +9,11 @@ import {
 import { createApi } from "@reduxjs/toolkit/query/react";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || "",
+  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1",
+  credentials: "include",
   prepareHeaders: (headers, { getState }) => {
     const state = getState() as any;
-    const token = state.auth.user?.accessToken;
+    const token = state.auth?.user?.accessToken;
     if (token) {
       headers.set("Authorization", `${token}`);
     }
@@ -26,17 +27,16 @@ const baseQueryWithReauth: BaseQueryFn<
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
-  if (result.error && result.error.status === 400) {
+  if (result.error && (result.error.status === 401 || result.error.status === 400)) {
     const state = api.getState() as any;
-    const refreshToken = state.auth.user?.refreshToken;
-    console.log(refreshToken);
+    const refreshToken = state.auth?.user?.refreshToken;
     if (!refreshToken) {
       api.dispatch(logOut());
       return result;
     }
     const refreshResult = await baseQuery(
       {
-        url: "user/refreshToken",
+        url: "/auth/refresh-token",
         method: "POST",
         body: {
           authorization: refreshToken,

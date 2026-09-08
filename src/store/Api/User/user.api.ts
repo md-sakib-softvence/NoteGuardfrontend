@@ -15,8 +15,16 @@ const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: (_result, _error, { id }) => [{ type: "User", id }],
     }),
+    getUsersByInterests: builder.query<{ statusCode: number; success: boolean; data: UserInterestGroup[] }, void>({
+      query: () => "/users/interests",
+      providesTags: ["User"],
+    }),
   }),
 });
 
-export const { useGetUserProfileQuery, useUpdateUserProfileMutation } = userApi;
+export const {
+  useGetUserProfileQuery,
+  useUpdateUserProfileMutation,
+  useGetUsersByInterestsQuery,
+} = userApi;
 export default userApi;

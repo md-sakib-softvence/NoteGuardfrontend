@@ -1,21 +1,28 @@
 import baseApi from "../BaseApi/BaseApi";
-import type { LoginPayload, SignupPayload, AuthResponse } from "./auth.type";
+import type {
+  LoginPayload,
+  SignupPayload,
+  LoginApiResponse,
+  SignupApiResponse,
+} from "./auth.type";
 
 const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    login: builder.mutation<AuthResponse, LoginPayload>({
+    login: builder.mutation<LoginApiResponse, LoginPayload>({
       query: (credentials) => ({
-        url: "/user/signin",
+        url: "/auth/login",
         method: "POST",
         body: credentials,
       }),
+      invalidatesTags: ["User"],
     }),
-    signup: builder.mutation<AuthResponse, SignupPayload>({
-      query: (credentials) => ({
-        url: "/user/signup",
+    signup: builder.mutation<SignupApiResponse, SignupPayload>({
+      query: (userData) => ({
+        url: "/users/create-user",
         method: "POST",
-        body: credentials,
+        body: userData,
       }),
+      invalidatesTags: ["User"],
     }),
   }),
 });

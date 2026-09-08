@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice } from "@reduxjs/toolkit";
 import { jwtDecode } from "jwt-decode";
 
 export interface User {
+  name?: string;
   email: string;
-  phone: string;
+  phone?: string;
   userId: string;
   role: string;
   accessToken?: string;
@@ -15,14 +17,7 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-  user: {
-    email: "",
-    phone: "",
-    userId: "",
-    role: "",
-    accessToken: "",
-    refreshToken: "",
-  },
+  user: null,
 };
 
 const authSlice = createSlice({
@@ -30,25 +25,52 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action) => {
-      const decode = jwtDecode(action.payload?.accessToken as string) as User;
-      if (action.payload.refreshToken) {
-        state.user = {
-          ...state.user,
-          email: decode.email,
-          userId: decode.userId,
-          role: decode.role,
-          accessToken: action.payload.accessToken,
-          refreshToken: action.payload.refreshToken,
-        };
-      } else {
-        state.user = {
-          ...state.user,
-          email: decode.email,
-          userId: decode.userId,
-          role: decode.role,
-          accessToken: action.payload.accessToken,
-        };
+      let decode: any = {};
+      const token = action.payload?.accessToken || action.payload?.token;
+      if (token) {
+        try {
+          decode = jwtDecode(token);
+        } catch {
+          // ignore decode errors if invalid
+        }
       }
+
+      const email =
+        action.payload?.user?.email ||
+        decode?.email ||
+        decode?.useremail ||
+        state.user?.email ||
+        "";
+
+      const userId =
+        action.payload?.user?._id ||
+        action.payload?.user?.userId ||
+        decode?.userId ||
+        decode?._id ||
+        decode?.id ||
+        state.user?.userId ||
+        "";
+
+      const role =
+        action.payload?.user?.role ||
+        decode?.role ||
+        state.user?.role ||
+        "customer";
+
+      const name =
+        action.payload?.user?.name ||
+        decode?.name ||
+        state.user?.name ||
+        "";
+
+      state.user = {
+        name,
+        email,
+        userId,
+        role,
+        accessToken: token || state.user?.accessToken,
+        refreshToken: action.payload?.refreshToken || state.user?.refreshToken,
+      };
     },
     logOut: (state) => {
       state.user = null;
