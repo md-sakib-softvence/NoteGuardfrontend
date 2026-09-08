@@ -18,7 +18,7 @@ export default function MyPostsPage() {
   // The backend $lookup aggregation returns the user object with a .posts array
   const posts = Array.isArray(postsData?.data) 
     ? postsData.data 
-    : postsData?.data?.posts || [];
+    : (postsData?.data as any)?.posts || [];
 
   return (
     <div className="space-y-6">
