@@ -25,7 +25,7 @@ const authApi = baseApi.injectEndpoints({
       invalidatesTags: ["User"],
     }),
     forgetPassword: builder.mutation<
-      BackendResponse<any>,
+      { success: boolean; message: string; data?: any },
       { email: string; name?: string; newPassword?: string }
     >({
       query: (data) => ({

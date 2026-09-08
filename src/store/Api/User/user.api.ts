@@ -1,5 +1,10 @@
 import baseApi from "../BaseApi/BaseApi";
-import type { UserProfile, UpdateProfilePayload } from "./user.type";
+import type {
+  UserProfile,
+  UpdateProfilePayload,
+  UserInterestGroup,
+  AllUsersResponse,
+} from "./user.type";
 
 const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -7,15 +12,47 @@ const userApi = baseApi.injectEndpoints({
       query: (id) => `/user/profile/${id}`,
       providesTags: (_result, _error, id) => [{ type: "User", id }],
     }),
-    updateUserProfile: builder.mutation<UserProfile, { id: string; payload: UpdateProfilePayload }>({
+    createUser: builder.mutation<
+      { success: boolean; message: string; data: UserProfile },
+      import("./user.type").CreateUserPayload
+    >({
+      query: (userData) => ({
+        url: "/users/create-user",
+        method: "POST",
+        body: userData,
+      }),
+      invalidatesTags: ["User"],
+    }),
+    updateUserProfile: builder.mutation<
+      UserProfile,
+      { id: string; payload: UpdateProfilePayload }
+    >({
       query: ({ id, payload }) => ({
-        url: `/user/profile/${id}`,
-        method: "PUT",
+        url: `/users/${id}`,
+        method: "PATCH",
         body: payload,
       }),
-      invalidatesTags: (_result, _error, { id }) => [{ type: "User", id }],
+      invalidatesTags: ["User"],
     }),
-    getUsersByInterests: builder.query<{ statusCode: number; success: boolean; data: UserInterestGroup[] }, void>({
+    getAllUsers: builder.query<AllUsersResponse, Record<string, unknown> | void>({
+      query: (params) => ({
+        url: "/users/alluser",
+        method: "GET",
+        params: params || {},
+      }),
+      providesTags: ["User"],
+    }),
+    deleteUser: builder.mutation<{ success: boolean; message: string }, string>({
+      query: (id) => ({
+        url: `/users/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["User"],
+    }),
+    getUsersByInterests: builder.query<
+      { statusCode: number; success: boolean; data: UserInterestGroup[] },
+      void
+    >({
       query: () => "/users/interests",
       providesTags: ["User"],
     }),
@@ -24,7 +61,10 @@ const userApi = baseApi.injectEndpoints({
 
 export const {
   useGetUserProfileQuery,
+  useCreateUserMutation,
   useUpdateUserProfileMutation,
+  useGetAllUsersQuery,
+  useDeleteUserMutation,
   useGetUsersByInterestsQuery,
 } = userApi;
 export default userApi;

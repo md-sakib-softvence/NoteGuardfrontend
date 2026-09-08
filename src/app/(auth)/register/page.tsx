@@ -73,7 +73,7 @@ export default function RegisterPage() {
         email: email.trim().toLowerCase(),
         password,
         interests: selectedInterests,
-        role: "customer",
+        role: "user",
       };
 
       const res = await signup(payload).unwrap();

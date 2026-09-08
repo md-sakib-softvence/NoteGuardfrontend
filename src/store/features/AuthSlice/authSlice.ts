@@ -55,7 +55,7 @@ const authSlice = createSlice({
         action.payload?.user?.role ||
         decode?.role ||
         state.user?.role ||
-        "customer";
+        "user";
 
       const name =
         action.payload?.user?.name ||
